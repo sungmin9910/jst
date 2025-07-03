@@ -21,7 +21,7 @@ def load_pesticide_data():
     df = pd.read_csv("전북_영농폐농약_발생량_2020_2023.csv", encoding="cp949")
     return df.loc[:, ~df.columns.str.startswith("증감_")]
 
-@st.cache_data
+@st.cache_data(ttl=0)
 def load_vinyl_collection_data():
     return pd.read_csv("연도별_영농폐비닐_수거량.csv", encoding="utf-8-sig")
 
