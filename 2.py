@@ -159,28 +159,21 @@ elif tab_option == "폐비닐 수거량(전국)":
 elif tab_option == "폐비닐 재활용량(전국)":
     df = load_vinyl_recycle_data()
     df_long = df.melt(id_vars='구분', var_name='연도', value_name='재활용량')
-
-    # 쉼표 제거 후 숫자 변환
-    df_long['재활용량'] = (
-        df_long['재활용량']
-        .astype(str)
-        .str.replace(",", "", regex=False)
-        .str.strip()
-    )
+    df_long['재활용량'] = df_long['재활용량'].astype(str).str.replace(",", "", regex=False).str.strip()
     df_long['재활용량'] = pd.to_numeric(df_long['재활용량'], errors='coerce')
-    df_long['연도'] = pd.to_numeric(df_long['연도'], errors='coerce')
+    df_long['연도'] = pd.to_numeric(df_long['연도'], errors='coerce').dropna().astype(int).astype(str)
 
-    # 필터 및 시각화
     selected = st.sidebar.multiselect("♻️ 품목 선택", df_long["구분"].unique(), default=df_long["구분"].unique())
     chart_type = st.sidebar.radio("📊 시각화 선택", ["막대그래프", "선그래프", "파이차트"])
 
     st.header("♻️ 폐비닐 재활용량 분석 (연도별 추이)")
-
     tabs = st.tabs(selected)
 
     for i, item in enumerate(selected):
         with tabs[i]:
-            view_df = df_long[df_long["구분"] == item].dropna(subset=["연도", "재활용량"])
+            view_df = df_long[df_long["구분"] == item].dropna(subset=["연도", "재활용량"]).copy()
+            view_df["연도"] = view_df["연도"].astype(str)
+
             styled_df = view_df.copy()
             styled_df["재활용량"] = styled_df["재활용량"].apply(lambda x: f"{x:,.0f}")
             st.dataframe(styled_df[["연도", "재활용량"]])
@@ -192,29 +185,31 @@ elif tab_option == "폐비닐 재활용량(전국)":
             else:
                 fig = px.pie(view_df, names="연도", values="재활용량", title=f"{item} 연도별 재활용 비율")
 
-            fig.update_layout(yaxis_tickformat=",")
+            fig.update_layout(
+                yaxis_tickformat=",",
+                xaxis=dict(type='category')
+            )
             st.plotly_chart(fig, use_container_width=True)
-
-
-
 
 # --------------------------
 # 폐농약용기 수거량
 elif tab_option == "폐농약용기 수거량(전국)":
     df = load_container_data()
     df_long = df.melt(id_vars='구분', var_name='연도', value_name='수거량')
-    df_long['연도'] = pd.to_numeric(df_long['연도'], errors='coerce')
+    df_long['연도'] = pd.to_numeric(df_long['연도'], errors='coerce').dropna().astype(int).astype(str)
     df_long['수거량'] = pd.to_numeric(df_long['수거량'], errors='coerce')
 
     selected = st.sidebar.multiselect("📦 품목 선택", df_long["구분"].unique(), default=df_long["구분"].unique())
     chart_type = st.sidebar.radio("📊 시각화 선택", ["막대그래프", "선그래프", "파이차트"])
 
     st.header("📦 폐농약용기 수거량 분석 (연도별 추이)")
-
     tabs = st.tabs(selected)
+
     for i, item in enumerate(selected):
         with tabs[i]:
-            view_df = df_long[df_long["구분"] == item].dropna()
+            view_df = df_long[df_long["구분"] == item].dropna().copy()
+            view_df["연도"] = view_df["연도"].astype(str)
+
             styled_df = view_df.copy()
             styled_df["수거량"] = styled_df["수거량"].apply(lambda x: f"{x:,.0f}")
             st.dataframe(styled_df[["연도", "수거량"]])
@@ -226,7 +221,10 @@ elif tab_option == "폐농약용기 수거량(전국)":
             else:
                 fig = px.pie(view_df, names="연도", values="수거량", title=f"{item} 연도별 수거 비율")
 
-            fig.update_layout(yaxis_tickformat=",")
+            fig.update_layout(
+                yaxis_tickformat=",",
+                xaxis=dict(type='category')
+            )
             st.plotly_chart(fig, use_container_width=True)
 
 
@@ -235,18 +233,20 @@ elif tab_option == "폐농약용기 수거량(전국)":
 elif tab_option == "폐농약용기 재활용량(전국)":
     df = load_recycle_data()
     df_long = df.melt(id_vars='구분', var_name='연도', value_name='재활용량')
-    df_long['연도'] = pd.to_numeric(df_long['연도'], errors='coerce')
+    df_long['연도'] = pd.to_numeric(df_long['연도'], errors='coerce').dropna().astype(int).astype(str)
     df_long['재활용량'] = pd.to_numeric(df_long['재활용량'], errors='coerce')
 
     selected = st.sidebar.multiselect("♻️ 품목 선택", df_long["구분"].unique(), default=df_long["구분"].unique())
     chart_type = st.sidebar.radio("📊 시각화 선택", ["막대그래프", "선그래프", "파이차트"])
 
     st.header("♻️ 폐농약용기 재활용량 분석 (연도별 추이)")
-
     tabs = st.tabs(selected)
+
     for i, item in enumerate(selected):
         with tabs[i]:
-            view_df = df_long[df_long["구분"] == item].dropna()
+            view_df = df_long[df_long["구분"] == item].dropna().copy()
+            view_df["연도"] = view_df["연도"].astype(str)
+
             styled_df = view_df.copy()
             styled_df["재활용량"] = styled_df["재활용량"].apply(lambda x: f"{x:,.0f}")
             st.dataframe(styled_df[["연도", "재활용량"]])
@@ -258,8 +258,12 @@ elif tab_option == "폐농약용기 재활용량(전국)":
             else:
                 fig = px.pie(view_df, names="연도", values="재활용량", title=f"{item} 연도별 재활용 비율")
 
-            fig.update_layout(yaxis_tickformat=",")
+            fig.update_layout(
+                yaxis_tickformat=",",
+                xaxis=dict(type='category')
+            )
             st.plotly_chart(fig, use_container_width=True)
+
 
 
 # --------------------------
