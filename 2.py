@@ -122,8 +122,9 @@ elif tab_option == "폐비닐 수거량(전국)":
         .str.replace(",", "", regex=False)
     )
     df_long['수거량'] = pd.to_numeric(df_long['수거량'], errors='coerce')
-    df_long["연도"] = pd.to_numeric(df_long["연도"], errors='coerce').dropna().astype(int)
+    #df_long["연도"] = pd.to_numeric(df_long["연도"], errors='coerce').dropna().astype(int)
     df_long = df_long.dropna(subset=['수거량'])
+    view_df["연도"] = view_df["연도"].astype(str)
 
     selected = st.sidebar.multiselect("📍 품목 선택", df_long["구분"].unique(), default=df_long["구분"].unique())
     chart_type = st.sidebar.radio("📊 시각화 선택", ["막대그래프", "선그래프", "파이차트"])
@@ -131,8 +132,7 @@ elif tab_option == "폐비닐 수거량(전국)":
     tabs = st.tabs(selected)
     for i, item in enumerate(selected):
         with tabs[i]:
-            view_df = df_long[df_long["구분"] == item]
-            view_df["연도"] = view_df["연도"].astype(str)
+            view_df = df_long[df_long["구분"] == item]            
             styled_df = view_df.copy()
             df_long["연도"] = df_long["연도"].astype(str)
             styled_df["수거량"] = styled_df["수거량"].apply(lambda x: f"{x:,.0f}")
