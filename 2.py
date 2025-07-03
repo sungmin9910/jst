@@ -70,20 +70,26 @@ if tab_option == "폐비닐":
 
     for i, year in enumerate(years):
         with tabs[i]:
-            # ✅ 해당 연도 컬럼 추출
+            # 해당 연도 데이터 추출
             cols = [col for col in df.columns if col.startswith(year)]
             filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
             renamed = {col: col.replace(f"{year}_", "") for col in cols}
             df_plot = filtered.rename(columns=renamed).set_index("구분")
 
-            # ✅ 숫자형으로 변환 (쉼표가 섞인 문자열일 수 있으므로 안전하게 처리)
+            # ✅ 쉼표 제거 + 숫자형으로 변환
             for col in df_plot.columns:
-                df_plot[col] = pd.to_numeric(df_plot[col], errors="coerce")
+                df_plot[col] = (
+                    df_plot[col]
+                    .astype(str)
+                    .str.replace(",", "")
+                    .str.strip()
+                )
+                df_plot[col] = pd.to_numeric(df_plot[col], errors="coerce")  # 숫자만 남음
 
-            # ✅ 쉼표 표시용 포맷 스타일 적용 (정렬 가능한 상태 유지)
+            # ✅ 숫자형 유지 + 쉼표 포맷 적용
             st.dataframe(df_plot.style.format("{:,.0f}"))
 
-            # ✅ 시각화 (숫자형 그대로 사용)
+            # ✅ 시각화
             fig = px.bar(
                 df_plot,
                 x=df_plot.index,
@@ -93,13 +99,6 @@ if tab_option == "폐비닐":
             )
             fig.update_layout(yaxis_tickformat=",")
             st.plotly_chart(fig, use_container_width=True)
-
-
-
-
-
-
-
 
 
 # --------------------------
