@@ -59,8 +59,6 @@ tab_option = st.sidebar.radio("📁 분석 대상", [
 
 # --------------------------
 # 폐비닐
-# --------------------------
-# 폐비닐
 if tab_option == "폐비닐":
     df = load_vinyl_data()
     df = df[df["구분"] != "전체"]
@@ -72,30 +70,36 @@ if tab_option == "폐비닐":
 
     for i, year in enumerate(years):
         with tabs[i]:
+            # 연도별 컬럼 추출 및 재구성
             cols = [col for col in df.columns if col.startswith(year)]
             filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
             renamed = {col: col.replace(f"{year}_", "") for col in cols}
             df_plot = filtered.rename(columns=renamed).set_index("구분")
-    
-            # ✅ 숫자 컬럼 쉼표 포맷용 컬럼 생성
+
+            # ✅ 숫자 쉼표 표시용 컬럼 생성
+            df_display = df_plot.copy()
+            for col in df_plot.columns:
+                df_display[col] = df_plot[col].apply(lambda x: f"{x:,.0f}")
+
+            # ✅ 정렬 가능한 숫자형 데이터프레임을 숨기고, 쉼표 표시용만 보여줌
+            st.dataframe(df_display, use_container_width=True)
+
+            # ✅ 그래프는 원본 숫자 기반으로 생성
             numeric_cols = df_plot.select_dtypes(include='number').columns
-            df_show = df_plot.copy()
-            for col in numeric_cols:
-                df_show[f"{col}_표시용"] = df_show[col].apply(lambda x: f"{x:,.0f}")
-    
-            columns_to_display = [col for col in df_show.columns if "표시용" in col]
-            df_show = df_show[columns_to_display]
-            df_show.index.name = "구분"
-            st.dataframe(df_show)
-    
-            # ✅ 그래프는 원본 숫자값으로 표시
-            fig = px.bar(df_plot[numeric_cols], x=df_plot.index, y=numeric_cols, barmode="stack", title=f"{year}년 폐비닐 발생량")
+            fig = px.bar(
+                df_plot[numeric_cols],
+                x=df_plot.index,
+                y=numeric_cols,
+                barmode="stack",
+                title=f"{year}년 폐비닐 발생량"
+            )
             fig.update_layout(
                 yaxis_tickformat=",",
-                yaxis_title="발생량 (톤)",  # 단위도 추가
+                yaxis_title="발생량 (톤)",
                 xaxis=dict(type='category')
             )
             st.plotly_chart(fig, use_container_width=True)
+
 
 
 
