@@ -79,6 +79,7 @@ if tab_option == "폐비닐":
             st.dataframe(df_plot.style.format({col: "{:,.0f}" for col in numeric_cols}))
             fig = px.bar(df_plot[numeric_cols], x=df_plot.index, y=numeric_cols, barmode="stack", title=f"{year}년 폐비닐 발생량")
             fig.update_layout(yaxis_tickformat=",")
+            fig.update_layout(yaxis_title="발생량 (톤)")
             st.plotly_chart(fig, use_container_width=True)
 
 
@@ -103,6 +104,7 @@ elif tab_option == "폐농약":
             st.dataframe(df_plot.style.format("{:,.0f}"))
             fig = px.bar(df_plot, x=df_plot.index, y=df_plot.columns, barmode="stack", title=f"{year}년 폐농약 발생량")
             fig.update_layout(yaxis_tickformat=",")
+            fig.update_layout(yaxis_title="발생량 (개개)")
             st.plotly_chart(fig, use_container_width=True)
 
 
@@ -150,6 +152,7 @@ elif tab_option == "폐비닐 수거량(전국)":
             fig.update_layout(
                 yaxis_tickformat=",",
                 xaxis=dict(type='category')  # 🎯 핵심: x축을 범주형으로 강제!
+            fig.update_layout(yaxis_title="수거량 (톤)")    
             )
             st.plotly_chart(fig, use_container_width=True)
 
@@ -188,6 +191,7 @@ elif tab_option == "폐비닐 재활용량(전국)":
             fig.update_layout(
                 yaxis_tickformat=",",
                 xaxis=dict(type='category')
+            fig.update_layout(yaxis_title="재활용용량 (톤)")    
             )
             st.plotly_chart(fig, use_container_width=True)
 
@@ -224,6 +228,7 @@ elif tab_option == "폐농약용기 수거량(전국)":
             fig.update_layout(
                 yaxis_tickformat=",",
                 xaxis=dict(type='category')
+            fig.update_layout(yaxis_title="수거량 (개개)")
             )
             st.plotly_chart(fig, use_container_width=True)
 
@@ -261,6 +266,7 @@ elif tab_option == "폐농약용기 재활용량(전국)":
             fig.update_layout(
                 yaxis_tickformat=",",
                 xaxis=dict(type='category')
+            fig.update_layout(yaxis_title="재활용량 (개)")
             )
             st.plotly_chart(fig, use_container_width=True)
 
