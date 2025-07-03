@@ -207,20 +207,18 @@ elif tab_option == "폐농약용기 수거량(전국)":
     tabs = st.tabs(selected)
     for i, item in enumerate(selected):
         with tabs[i]:
-            view_df = df_long[df_long["구분"] == item].dropna()
+            view_df = df_long[df_long["구분"] == item].dropna().copy()
+            view_df["연도"] = view_df["연도"].astype(str)  # ✅ 문자열로 변환!
             styled_df = view_df.copy()
             styled_df["수거량"] = styled_df["수거량"].apply(lambda x: f"{x:,.0f}")
             st.dataframe(styled_df[["연도", "수거량"]])
-
+        
             if chart_type == "막대그래프":
                 fig = px.bar(view_df, x="연도", y="수거량", title=f"{item} 연도별 수거량")
             elif chart_type == "선그래프":
                 fig = px.line(view_df, x="연도", y="수거량", markers=True, title=f"{item} 수거량 추이")
             else:
                 fig = px.pie(view_df, names="연도", values="수거량", title=f"{item} 연도별 수거 비율")
-
-            fig.update_layout(yaxis_tickformat=",")
-            st.plotly_chart(fig, use_container_width=True)
 
 
 # --------------------------
@@ -239,20 +237,18 @@ elif tab_option == "폐농약용기 재활용량(전국)":
     tabs = st.tabs(selected)
     for i, item in enumerate(selected):
         with tabs[i]:
-            view_df = df_long[df_long["구분"] == item].dropna()
+            view_df = df_long[df_long["구분"] == item].dropna().copy()
+            view_df["연도"] = view_df["연도"].astype(str)  # ✅ 문자열로 변환!
             styled_df = view_df.copy()
             styled_df["재활용량"] = styled_df["재활용량"].apply(lambda x: f"{x:,.0f}")
             st.dataframe(styled_df[["연도", "재활용량"]])
-
+        
             if chart_type == "막대그래프":
                 fig = px.bar(view_df, x="연도", y="재활용량", title=f"{item} 연도별 재활용량")
             elif chart_type == "선그래프":
                 fig = px.line(view_df, x="연도", y="재활용량", markers=True, title=f"{item} 재활용 추이")
             else:
                 fig = px.pie(view_df, names="연도", values="재활용량", title=f"{item} 연도별 재활용 비율")
-
-            fig.update_layout(yaxis_tickformat=",")
-            st.plotly_chart(fig, use_container_width=True)
 
 
 # --------------------------
