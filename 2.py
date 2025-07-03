@@ -175,6 +175,7 @@ elif tab_option == "폐비닐 재활용량(전국)":
     for i, item in enumerate(selected):
         with tabs[i]:
             view_df = df_long[df_long["구분"] == item].dropna(subset=["연도", "재활용량"])
+            view_df["연도"] = view_df["연도"].astype(str)
             styled_df = view_df.copy()
             styled_df["재활용량"] = styled_df["재활용량"].apply(lambda x: f"{x:,.0f}")
             st.dataframe(styled_df[["연도", "재활용량"]])
