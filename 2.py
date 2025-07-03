@@ -75,6 +75,7 @@ if tab_option == "폐비닐":
             filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
             renamed = {col: col.replace(f"{year}_", "") for col in cols}
             df_plot = filtered.rename(columns=renamed).set_index("구분")
+            st.dataframe(df_plot.style.format("{:,.0f}"))
             numeric_cols = df_plot.select_dtypes(include='number').columns
             st.dataframe(df_plot.style.format({col: "{:,.0f}" for col in numeric_cols}))
             fig = px.bar(df_plot[numeric_cols], x=df_plot.index, y=numeric_cols, barmode="stack", title=f"{year}년 폐비닐 발생량")
