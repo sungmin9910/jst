@@ -76,7 +76,13 @@ if tab_option == "폐비닐":
             renamed = {col: col.replace(f"{year}_", "") for col in cols}
             df_plot = filtered.rename(columns=renamed).set_index("구분")
             numeric_cols = df_plot.select_dtypes(include='number').columns
-            st.dataframe(df_plot, use_container_width=True, column_config={col: st.column_config.NumberColumn(format="%,d") for col in numeric_cols})
+            st.dataframe(
+    df_plot,
+    use_container_width=True,
+    column_config={
+        col: st.column_config.NumberColumn(format="%,d") for col in numeric_cols
+    }
+)
             fig = px.bar(df_plot[numeric_cols], x=df_plot.index, y=numeric_cols, barmode="stack", title=f"{year}년 폐비닐 발생량")
             fig.update_layout(yaxis_tickformat=",")
             fig.update_layout(yaxis_title="발생량 (톤)")
