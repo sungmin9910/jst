@@ -190,3 +190,4 @@ elif tab_option == "폐비닐 분포지도(전북)":
         html(m._repr_html_(), height=600, width=1000)
     else:
         st.error(f"❌ 파일이 존재하지 않습니다: {FILE_PATH}")
+
