@@ -229,6 +229,7 @@ elif tab_option == "폐농약용기 수거량(전국)":
 
             fig.update_layout(
                 yaxis_tickformat=",",
+                yaxis_title="수거량 (개)",
                 xaxis=dict(type='category')
             
             )
@@ -267,6 +268,7 @@ elif tab_option == "폐농약용기 재활용량(전국)":
 
             fig.update_layout(
                 yaxis_tickformat=",",
+                yaxis_title="재활용량 (개)",
                 xaxis=dict(type='category')
             
             )
