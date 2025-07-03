@@ -132,7 +132,9 @@ elif tab_option == "폐비닐 수거량(전국)":
     for i, item in enumerate(selected):
         with tabs[i]:
             view_df = df_long[df_long["구분"] == item]
+            view_df["연도"] = view_df["연도"].astype(str)
             styled_df = view_df.copy()
+            df_long["연도"] = df_long["연도"].astype(str)
             styled_df["수거량"] = styled_df["수거량"].apply(lambda x: f"{x:,.0f}")
             st.dataframe(styled_df[["연도", "수거량"]])
 
