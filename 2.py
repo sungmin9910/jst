@@ -90,7 +90,7 @@ elif tab_option == "폐농약용기 수거량(전국)":
     df = load_container_data()
     df_long = df.melt(id_vars='구분', var_name='연도', value_name='수거량')
     df_long['연도'] = df_long['연도'].astype(int)
-    df_long['수거량'] = pd.to_numeric(df_long['수거량(갯수)'], errors='coerce')
+    df_long['수거량'] = pd.to_numeric(df_long['수거량'], errors='coerce')
     selected = st.sidebar.multiselect("📦 품목 선택", df_long["구분"].unique(), default=df_long["구분"].unique())
     chart_type = st.sidebar.radio("📊 시각화 선택", ["막대그래프", "선그래프", "파이차트"])
     st.header("📦 폐농약용기 수거량 분석(갯수)")
@@ -102,13 +102,13 @@ elif tab_option == "폐농약용기 수거량(전국)":
             styled_df["수거량"] = styled_df["수거량"].apply(lambda x: f"{x:,.0f}")
             st.dataframe(styled_df[["구분", "수거량"]])
             if chart_type == "막대그래프":
-                fig = px.bar(view_df, x="구분", y="수거량", title=f"{y}년 품목별 수거량")
+                fig = px.bar(view_df, x="구분", y="수거량(갯수)", title=f"{y}년 품목별 수거량")
                 fig.update_layout(yaxis_tickformat=",")
             elif chart_type == "선그래프":
-                fig = px.line(view_df, x="구분", y="수거량", markers=True, title=f"{y}년 수거량 추이")
+                fig = px.line(view_df, x="구분", y="수거량(갯수)", markers=True, title=f"{y}년 수거량 추이")
                 fig.update_layout(yaxis_tickformat=",")
             else:
-                fig = px.pie(view_df, names="구분", values="수거량", title=f"{y}년 품목별 수거 비율")
+                fig = px.pie(view_df, names="구분", values="수거량(갯수)", title=f"{y}년 품목별 수거 비율")
             st.plotly_chart(fig, use_container_width=True)
 
 # --------------------------
@@ -117,7 +117,7 @@ elif tab_option == "폐농약용기 재활용량(전국)":
     df = load_recycle_data()
     df_long = df.melt(id_vars='구분', var_name='연도', value_name='재활용량')
     df_long['연도'] = df_long['연도'].astype(int)
-    df_long['재활용량'] = pd.to_numeric(df_long['재활용량(갯수)'], errors='coerce')
+    df_long['재활용량'] = pd.to_numeric(df_long['재활용량'], errors='coerce')
     selected = st.sidebar.multiselect("♻️ 품목 선택", df_long["구분"].unique(), default=df_long["구분"].unique())
     chart_type = st.sidebar.radio("📊 시각화 선택", ["막대그래프", "선그래프", "파이차트"])
     st.header("♻️ 폐농약용기 재활용량 분석(갯수)")
@@ -129,13 +129,13 @@ elif tab_option == "폐농약용기 재활용량(전국)":
             styled_df["재활용량"] = styled_df["재활용량"].apply(lambda x: f"{x:,.0f}")
             st.dataframe(styled_df[["구분", "재활용량"]])
             if chart_type == "막대그래프":
-                fig = px.bar(view_df, x="구분", y="재활용량", title=f"{y}년 품목별 재활용량")
+                fig = px.bar(view_df, x="구분", y="재활용량(갯수)", title=f"{y}년 품목별 재활용량")
                 fig.update_layout(yaxis_tickformat=",")
             elif chart_type == "선그래프":
-                fig = px.line(view_df, x="구분", y="재활용량", markers=True, title=f"{y}년 재활용 추이")
+                fig = px.line(view_df, x="구분", y="재활용량(갯수)", markers=True, title=f"{y}년 재활용 추이")
                 fig.update_layout(yaxis_tickformat=",")
             else:
-                fig = px.pie(view_df, names="구분", values="재활용량", title=f"{y}년 품목별 재활용 비율")
+                fig = px.pie(view_df, names="구분", values="재활용량(갯수)", title=f"{y}년 품목별 재활용 비율")
             st.plotly_chart(fig, use_container_width=True)
 
 # --------------------------
