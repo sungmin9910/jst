@@ -68,7 +68,8 @@ if tab_option == "폐비닐":
 
     for i, year in enumerate(years):
         with tabs[i]:
-            cols = [col for col in df.columns if col.startswith(year) and "계" not in col]
+            # ✅ '계' 포함
+            cols = [col for col in df.columns if col.startswith(year)]
             filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
             renamed = {col: col.replace(f"{year}_", "") for col in cols}
             df_plot = filtered.rename(columns=renamed).set_index("구분")
@@ -77,6 +78,7 @@ if tab_option == "폐비닐":
             fig = px.bar(df_plot, x=df_plot.index, y=df_plot.columns, barmode="stack", title=f"{year}년 폐비닐 발생량")
             fig.update_layout(yaxis_tickformat=",")
             st.plotly_chart(fig, use_container_width=True)
+
 
 
 # --------------------------
@@ -92,7 +94,8 @@ elif tab_option == "폐농약":
 
     for i, year in enumerate(years):
         with tabs[i]:
-            cols = [f"{year}_플라스틱", f"{year}_농약봉지류"]
+            # ✅ '계' 포함
+            cols = [col for col in df.columns if col.startswith(year)]
             filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
             df_plot = filtered.set_index("구분")
             styled_df = df_plot.applymap(lambda x: f"{x:,.0f}")
@@ -100,6 +103,7 @@ elif tab_option == "폐농약":
             fig = px.bar(df_plot, x=df_plot.index, y=df_plot.columns, barmode="stack", title=f"{year}년 폐농약 발생량")
             fig.update_layout(yaxis_tickformat=",")
             st.plotly_chart(fig, use_container_width=True)
+
 
 
 
