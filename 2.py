@@ -131,7 +131,7 @@ elif tab_option == "폐비닐 수거량(전국)":
     tabs = st.tabs(selected)
     for i, item in enumerate(selected):
         with tabs[i]:
-            view_df = df_long[df_long["구분"] == item].copy()
+            view_df = df_long[df_long["구분"] == item]
             view_df["연도"] = view_df["연도"].astype(str)  # ✅ 반드시 copy 후 변환
             styled_df = view_df.copy()
             styled_df["수거량"] = styled_df["수거량"].apply(lambda x: f"{x:,.0f}")
@@ -207,7 +207,7 @@ elif tab_option == "폐농약용기 수거량(전국)":
     tabs = st.tabs(selected)
     for i, item in enumerate(selected):
         with tabs[i]:
-            view_df = df_long[df_long["구분"] == item].dropna().copy()
+            view_df = df_long[df_long["구분"] == item].dropna()
             view_df["연도"] = view_df["연도"].astype(str)  # ✅ 문자열로 변환!
             styled_df = view_df.copy()
             styled_df["수거량"] = styled_df["수거량"].apply(lambda x: f"{x:,.0f}")
@@ -237,7 +237,7 @@ elif tab_option == "폐농약용기 재활용량(전국)":
     tabs = st.tabs(selected)
     for i, item in enumerate(selected):
         with tabs[i]:
-            view_df = df_long[df_long["구분"] == item].dropna().copy()
+            view_df = df_long[df_long["구분"] == item].dropna()
             view_df["연도"] = view_df["연도"].astype(str)  # ✅ 문자열로 변환!
             styled_df = view_df.copy()
             styled_df["재활용량"] = styled_df["재활용량"].apply(lambda x: f"{x:,.0f}")
