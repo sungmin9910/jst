@@ -76,13 +76,15 @@ if tab_option == "폐비닐":
             renamed = {col: col.replace(f"{year}_", "") for col in cols}
             df_plot = filtered.rename(columns=renamed).set_index("구분")
     
-            # ✅ 숫자 포맷 적용 (정렬 가능)
-            st.dataframe(df_plot.style.format("{:,.0f}"))
+            # ✅ 숫자형 컬럼만 포맷 적용
+            numeric_cols = df_plot.select_dtypes(include=["int", "float"]).columns
+            st.dataframe(df_plot.style.format({col: "{:,.0f}" for col in numeric_cols}))
     
             # ✅ 시각화
-            fig = px.bar(df_plot, x=df_plot.index, y=df_plot.columns, barmode="stack", title=f"{year}년 폐비닐 발생량")
+            fig = px.bar(df_plot[numeric_cols], x=df_plot.index, y=numeric_cols, barmode="stack", title=f"{year}년 폐비닐 발생량")
             fig.update_layout(yaxis_tickformat=",")
             st.plotly_chart(fig, use_container_width=True)
+
 
 
 
