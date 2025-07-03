@@ -65,26 +65,32 @@ if tab_option == "폐비닐":
     years = sorted({col[:4] for col in df.columns if "_" in col})
 
     st.header("🧪 전북 영농 폐비닐 발생량")
-    selected_regions = st.sidebar.multiselect("📍 지역 선택", df["구분"].unique(), default=df["구분"].unique())
+    selected_regions = st.sidebar.multiselect(
+        "📍 지역 선택", df["구분"].unique(), default=df["구분"].unique()
+    )
     tabs = st.tabs([f"{y}년" for y in years])
 
     for i, year in enumerate(years):
         with tabs[i]:
-            # 연도별 컬럼 추출 및 재구성
+            # ✅ 해당 연도의 컬럼만 추출
             cols = [col for col in df.columns if col.startswith(year)]
             filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
+
+            # ✅ 컬럼 이름에서 연도 제거 (예: 2020_멀칭형_LDPE → 멀칭형_LDPE)
             renamed = {col: col.replace(f"{year}_", "") for col in cols}
             df_plot = filtered.rename(columns=renamed).set_index("구분")
 
-            # ✅ 숫자 쉼표 표시용 컬럼 생성
+            # ✅ 쉼표 포맷 표시용 테이블 생성 (NaN 및 비숫자 안전처리 포함)
             df_display = df_plot.copy()
-            for col in df_plot.columns:
-                df_display[col] = df_plot[col].apply(lambda x: f"{x:,.0f}")
+            for col in df_display.columns:
+                df_display[col] = df_display[col].apply(
+                    lambda x: f"{x:,.0f}" if pd.notnull(x) and isinstance(x, (int, float)) else "-"
+                )
 
-            # ✅ 정렬 가능한 숫자형 데이터프레임을 숨기고, 쉼표 표시용만 보여줌
+            # ✅ 표시용 테이블 출력 (정렬 가능)
             st.dataframe(df_display, use_container_width=True)
 
-            # ✅ 그래프는 원본 숫자 기반으로 생성
+            # ✅ 그래프는 원본 숫자 데이터 기반
             numeric_cols = df_plot.select_dtypes(include='number').columns
             fig = px.bar(
                 df_plot[numeric_cols],
@@ -95,10 +101,11 @@ if tab_option == "폐비닐":
             )
             fig.update_layout(
                 yaxis_tickformat=",",
-                yaxis_title="발생량 (톤)",
+                yaxis_title="발생량 (톤)",  # ✅ 단위 추가
                 xaxis=dict(type='category')
             )
             st.plotly_chart(fig, use_container_width=True)
+
 
 
 
