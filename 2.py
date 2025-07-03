@@ -136,7 +136,7 @@ elif tab_option == "폐농약용기 재활용량(전국)":
 # 폐농약용기 분포지도
 # --------------------------
 elif tab_option == "폐농약용기 분포지도(전북)":
-    st.header("🗺️ 전라북도 폐농약용기 분포 지도")
+    st.header("🗺️ 전라북도 폐농약용기 발생량 분포 지도")
     FILE_PATH = "전북_총폐농약용기.xlsx"
     if os.path.exists(FILE_PATH):
         df = pd.read_excel(FILE_PATH)
@@ -162,7 +162,7 @@ elif tab_option == "폐농약용기 분포지도(전북)":
 # 폐비닐 분포지도 (전북)
 # --------------------------
 elif tab_option == "폐비닐 분포지도(전북)":
-    st.header("🗺️ 전라북도 폐비닐 분포 지도")
+    st.header("🗺️ 전라북도 폐비닐 발생량 분포 지도")
     FILE_PATH = "전북_총폐비닐.xlsx"
     if os.path.exists(FILE_PATH):
         df = pd.read_excel(FILE_PATH)
