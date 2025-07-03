@@ -70,18 +70,33 @@ if tab_option == "폐비닐":
     selected_regions = st.sidebar.multiselect("📍 지역 선택", df["구분"].unique(), default=df["구분"].unique())
     tabs = st.tabs([f"{y}년" for y in years])
 
-    for i, year in enumerate(years):
-        with tabs[i]:
-            # ✅ '계' 포함
-            cols = [col for col in df.columns if col.startswith(year)]
-            filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
-            renamed = {col: col.replace(f"{year}_", "") for col in cols}
-            df_plot = filtered.rename(columns=renamed).set_index("구분")
-            numeric_cols = df_plot.select_dtypes(include='number').columns
-            st.dataframe(df_plot.style.format({col: "{:,.0f}" for col in numeric_cols}))
-            fig = px.bar(df_plot[numeric_cols], x=df_plot.index, y=numeric_cols, barmode="stack", title=f"{year}년 폐비닐 발생량")
-            fig.update_layout(yaxis_tickformat=",")
-            st.plotly_chart(fig, use_container_width=True)
+for i, year in enumerate(years):
+    with tabs[i]:
+        cols = [col for col in df.columns if col.startswith(year)]
+        filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
+        renamed = {col: col.replace(f"{year}_", "") for col in cols}
+        df_plot = filtered.rename(columns=renamed).set_index("구분")
+
+        # ✅ 숫자 컬럼 쉼표 포맷용 컬럼 생성
+        numeric_cols = df_plot.select_dtypes(include='number').columns
+        df_show = df_plot.copy()
+        for col in numeric_cols:
+            df_show[f"{col}_표시용"] = df_show[col].apply(lambda x: f"{x:,.0f}")
+
+        columns_to_display = [col for col in df_show.columns if "표시용" in col]
+        df_show = df_show[columns_to_display]
+        df_show.index.name = "구분"
+        st.dataframe(df_show)
+
+        # ✅ 그래프는 원본 숫자값으로 표시
+        fig = px.bar(df_plot[numeric_cols], x=df_plot.index, y=numeric_cols, barmode="stack", title=f"{year}년 폐비닐 발생량")
+        fig.update_layout(
+            yaxis_tickformat=",",
+            yaxis_title="발생량 (톤)",  # 단위도 추가
+            xaxis=dict(type='category')
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
 
 
 
