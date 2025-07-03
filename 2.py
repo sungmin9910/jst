@@ -10,9 +10,10 @@ import os
 # 데이터 로딩
 # --------------------------
 @st.cache_data
-def load_vinyl_data():
-    df = pd.read_csv("전북_영농폐비닐_발생량_2020_2023.csv", encoding="cp949")
-    return df.loc[:, ~df.columns.str.startswith("증감_")]
+def load_csv_from_github():
+    url = "https://raw.githubusercontent.com/sungmin9910/jst/refs/heads/main/%EC%A0%84%EB%B6%81_%EC%98%81%EB%86%8D%ED%8F%90%EB%B9%84%EB%8B%90_%EB%B0%9C%EC%83%9D%EB%9F%89_2020_2023.csv"
+    return pd.read_csv(url, encoding='utf-8')
+
 
 @st.cache_data
 def load_pesticide_data():
