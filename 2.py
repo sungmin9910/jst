@@ -21,13 +21,13 @@ def load_pesticide_data():
 
 @st.cache_data
 def load_vinyl_collection_data():
-    try:
-        return pd.read_csv("연도별_영농폐비닐_수거량.csv", encoding="utf-8")
-    except UnicodeDecodeError:
-        try:
-            return pd.read_csv("연도별_영농폐비닐_수거량.csv", encoding="cp949")
-        except UnicodeDecodeError:
-            return pd.read_csv("연도별_영농폐비닐_수거량.csv", encoding="euc-kr")
+    df = pd.read_csv("연도별_영농폐비닐_수거량.csv", encoding="utf-8-sig")
+    df_long = df.melt(id_vars='구분', var_name='연도', value_name='수거량')
+
+    # ✅ 쉼표 제거 후 숫자로 변환
+    df_long['수거량'] = df_long['수거량'].astype(str).str.replace(",", "").astype(float)
+
+    return df_long
 
 @st.cache_data
 def load_container_data():
