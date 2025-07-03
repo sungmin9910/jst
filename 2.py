@@ -104,7 +104,7 @@ elif tab_option == "폐농약":
             st.dataframe(df_plot.style.format("{:,.0f}"))
             fig = px.bar(df_plot, x=df_plot.index, y=df_plot.columns, barmode="stack", title=f"{year}년 폐농약 발생량")
             fig.update_layout(yaxis_tickformat=",")
-            fig.update_layout(yaxis_title="발생량 (개개)")
+            fig.update_layout(yaxis_title="발생량 (개)")
             st.plotly_chart(fig, use_container_width=True)
 
 
