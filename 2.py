@@ -60,41 +60,76 @@ tab_option = st.sidebar.radio("📁 분석 대상", [
 if tab_option == "폐비닐":
     df = load_vinyl_data()
     df = df[df["구분"] != "전체"]
-    years = sorted({col[:4] for col in df.columns if "_" in col})
-    st.header("🧪 전북 영농 폐비닐 발생량")
-    selected_regions = st.sidebar.multiselect("📍 지역 선택", df["구분"].unique(), default=df["구분"].unique())
-    tabs = st.tabs([f"{y}년" for y in years])
-    for i, year in enumerate(years):
+    
+    # 연도 컬럼 파싱
+    year_cols = [col for col in df.columns if "_" in col and "계" not in col]
+    year_list = sorted(list(set([col.split("_")[0] for col in year_cols])))
+
+    # 데이터를 연도별로 melt
+    df_long = df.melt(id_vars="구분", var_name="항목", value_name="발생량")
+    df_long = df_long[~df_long["항목"].str.contains("계")]
+    df_long["연도"] = df_long["항목"].apply(lambda x: x.split("_")[0])
+    df_long["종류"] = df_long["항목"].apply(lambda x: x.split("_")[1])
+    df_long["발생량"] = pd.to_numeric(df_long["발생량"], errors='coerce')
+    df_long.dropna(subset=["발생량"], inplace=True)
+
+    st.header("🧪 전북 영농 폐비닐 발생량 (연도별 추이)")
+    selected_regions = st.sidebar.multiselect("📍 지역 선택", df_long["구분"].unique(), default=df_long["구분"].unique())
+    chart_type = st.sidebar.radio("📊 시각화 선택", ["막대그래프", "선그래프", "파이차트"])
+
+    tabs = st.tabs(selected_regions)
+    for i, region in enumerate(selected_regions):
         with tabs[i]:
-            cols = [col for col in df.columns if col.startswith(year) and "계" not in col]
-            filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
-            renamed = {col: col.replace(f"{year}_", "") for col in cols}
-            df_plot = filtered.rename(columns=renamed).set_index("구분")
-            styled_df = df_plot.applymap(lambda x: f"{x:,.0f}")
-            st.dataframe(styled_df)
-            fig = px.bar(df_plot, x=df_plot.index, y=df_plot.columns, barmode="stack", title=f"{year}년 폐비닐 발생량")
+            region_df = df_long[df_long["구분"] == region]
+            st.dataframe(region_df.pivot_table(index="연도", columns="종류", values="발생량", aggfunc="sum").fillna(0).astype(int).applymap(lambda x: f"{x:,}"))
+
+            if chart_type == "막대그래프":
+                fig = px.bar(region_df, x="연도", y="발생량", color="종류", barmode="stack", title=f"{region} 연도별 폐비닐 발생량")
+            elif chart_type == "선그래프":
+                fig = px.line(region_df, x="연도", y="발생량", color="종류", markers=True, title=f"{region} 연도별 폐비닐 발생 추이")
+            else:
+                fig = px.pie(region_df, names="연도", values="발생량", title=f"{region} 연도별 비율")
+            
             fig.update_layout(yaxis_tickformat=",")
             st.plotly_chart(fig, use_container_width=True)
+
 
 # --------------------------
 # 폐농약
 elif tab_option == "폐농약":
     df = load_pesticide_data()
     df = df[df["구분"] != "전체"]
-    years = sorted({col[:4] for col in df.columns if "_" in col})
-    st.header("💧 전북 영농 폐농약 발생량")
-    selected_regions = st.sidebar.multiselect("📍 지역 선택", df["구분"].unique(), default=df["구분"].unique())
-    tabs = st.tabs([f"{y}년" for y in years])
-    for i, year in enumerate(years):
+
+    year_cols = [col for col in df.columns if "_" in col]
+    year_list = sorted(list(set([col.split("_")[0] for col in year_cols])))
+
+    # melt 구조 변경
+    df_long = df.melt(id_vars="구분", var_name="항목", value_name="발생량")
+    df_long["연도"] = df_long["항목"].apply(lambda x: x.split("_")[0])
+    df_long["종류"] = df_long["항목"].apply(lambda x: x.split("_")[1])
+    df_long["발생량"] = pd.to_numeric(df_long["발생량"], errors="coerce")
+    df_long.dropna(subset=["발생량"], inplace=True)
+
+    st.header("💧 전북 영농 폐농약 발생량 (연도별 추이)")
+    selected_regions = st.sidebar.multiselect("📍 지역 선택", df_long["구분"].unique(), default=df_long["구분"].unique())
+    chart_type = st.sidebar.radio("📊 시각화 선택", ["막대그래프", "선그래프", "파이차트"])
+
+    tabs = st.tabs(selected_regions)
+    for i, region in enumerate(selected_regions):
         with tabs[i]:
-            cols = [f"{year}_플라스틱", f"{year}_농약봉지류"]
-            filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
-            df_plot = filtered.set_index("구분")
-            styled_df = df_plot.applymap(lambda x: f"{x:,.0f}")
-            st.dataframe(styled_df)
-            fig = px.bar(df_plot, x=df_plot.index, y=df_plot.columns, barmode="stack", title=f"{year}년 폐농약 발생량")
+            region_df = df_long[df_long["구분"] == region]
+            st.dataframe(region_df.pivot_table(index="연도", columns="종류", values="발생량", aggfunc="sum").fillna(0).astype(int).applymap(lambda x: f"{x:,}"))
+
+            if chart_type == "막대그래프":
+                fig = px.bar(region_df, x="연도", y="발생량", color="종류", barmode="stack", title=f"{region} 연도별 폐농약 발생량")
+            elif chart_type == "선그래프":
+                fig = px.line(region_df, x="연도", y="발생량", color="종류", markers=True, title=f"{region} 연도별 폐농약 발생 추이")
+            else:
+                fig = px.pie(region_df, names="연도", values="발생량", title=f"{region} 연도별 비율")
+
             fig.update_layout(yaxis_tickformat=",")
             st.plotly_chart(fig, use_container_width=True)
+
 
 # --------------------------
 # 폐비닐 수거량(전국)
