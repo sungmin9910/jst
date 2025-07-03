@@ -125,8 +125,10 @@ elif tab_option == "폐농약용기 수거량(전국)":
     df_long = df.melt(id_vars='구분', var_name='연도', value_name='수거량')
     df_long['연도'] = df_long['연도'].astype(int)
     df_long['수거량'] = pd.to_numeric(df_long['수거량'], errors='coerce')
+    
     selected = st.sidebar.multiselect("📦 품목 선택", df_long["구분"].unique(), default=df_long["구분"].unique())
     chart_type = st.sidebar.radio("📊 시각화 선택", ["막대그래프", "선그래프", "파이차트"])
+    
     st.header("📦 폐농약용기 수거량 분석")
     tabs = st.tabs([f"{y}년" for y in sorted(df_long['연도'].unique())])
     for i, y in enumerate(sorted(df_long['연도'].unique())):
