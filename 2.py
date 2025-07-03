@@ -122,7 +122,10 @@ elif tab_option == "폐비닐 수거량(전국)":
         .str.replace(",", "", regex=False)
     )
     df_long['수거량'] = pd.to_numeric(df_long['수거량'], errors='coerce')
-    df_long["연도"] = pd.to_numeric(df_long["연도"], errors='coerce').dropna().astype(int)
+
+    # ⚠️ 여기 수정 핵심: 연도를 문자열로 강제 변환
+    df_long["연도"] = df_long["연도"].astype(str)
+
     df_long = df_long.dropna(subset=['수거량'])
 
     selected = st.sidebar.multiselect("📍 품목 선택", df_long["구분"].unique(), default=df_long["구분"].unique())
@@ -131,10 +134,9 @@ elif tab_option == "폐비닐 수거량(전국)":
     tabs = st.tabs(selected)
     for i, item in enumerate(selected):
         with tabs[i]:
-            view_df = df_long[df_long["구분"] == item]
-            view_df = view_df.dropna()
-            df_long["연도"] = df_long["연도"].astype(str)
-            styled_df = view_df.copy()            
+            view_df = df_long[df_long["구분"] == item].copy()
+
+            styled_df = view_df.copy()
             styled_df["수거량"] = styled_df["수거량"].apply(lambda x: f"{x:,.0f}")
             st.dataframe(styled_df[["연도", "수거량"]])
 
@@ -145,8 +147,12 @@ elif tab_option == "폐비닐 수거량(전국)":
             else:
                 fig = px.pie(view_df, names="연도", values="수거량", title=f"{item} 연도별 수거 비율")
 
-            fig.update_layout(yaxis_tickformat=",")
+            fig.update_layout(
+                yaxis_tickformat=",",
+                xaxis=dict(type='category')  # 🎯 핵심: x축을 범주형으로 강제!
+            )
             st.plotly_chart(fig, use_container_width=True)
+
 
 # --------------------------
 # 폐비닐 재활용량(전국)
