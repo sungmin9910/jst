@@ -122,7 +122,7 @@ elif tab_option == "폐비닐 수거량(전국)":
         .str.replace(",", "", regex=False)
     )
     df_long['수거량'] = pd.to_numeric(df_long['수거량'], errors='coerce')
-    df_long["연도"] = pd.to_numeric(df_long["연도"], errors='coerce').astype("Int64")
+    df_long["연도"] = pd.to_numeric(df_long["연도"], errors='coerce').astype(int)
     df_long = df_long.dropna(subset=['수거량'])
 
     selected = st.sidebar.multiselect("📍 품목 선택", df_long["구분"].unique(), default=df_long["구분"].unique())
