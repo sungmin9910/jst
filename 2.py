@@ -137,6 +137,7 @@ elif tab_option == "폐비닐 수거량(전국)":
 
             st.plotly_chart(fig, use_container_width=True)
 # --------------------------
+# 폐비닐 재활용량(전국)
 elif tab_option == "폐비닐 재활용량(전국)":
     df = load_vinyl_recycle_data()
     df_long = df.melt(id_vars='구분', var_name='연도', value_name='재활용량')
@@ -154,22 +155,28 @@ elif tab_option == "폐비닐 재활용량(전국)":
     # 필터 및 시각화
     selected = st.sidebar.multiselect("♻️ 품목 선택", df_long["구분"].unique(), default=df_long["구분"].unique())
     chart_type = st.sidebar.radio("📊 시각화 선택", ["막대그래프", "선그래프", "파이차트"])
-    st.header("♻️ 폐비닐 재활용량 분석")
-    tabs = st.tabs([f"{y}년" for y in sorted(df_long['연도'].dropna().unique())])
-    for i, y in enumerate(sorted(df_long['연도'].dropna().unique())):
+
+    st.header("♻️ 폐비닐 재활용량 분석 (연도별 추이)")
+
+    tabs = st.tabs(selected)
+
+    for i, item in enumerate(selected):
         with tabs[i]:
-            view_df = df_long[(df_long['연도'] == y) & (df_long['구분'].isin(selected))]
+            view_df = df_long[df_long["구분"] == item].dropna(subset=["연도", "재활용량"])
             styled_df = view_df.copy()
             styled_df["재활용량"] = styled_df["재활용량"].apply(lambda x: f"{x:,.0f}")
-            st.dataframe(styled_df[["구분", "재활용량"]])
+            st.dataframe(styled_df[["연도", "재활용량"]])
+
             if chart_type == "막대그래프":
-                fig = px.bar(view_df, x="구분", y="재활용량", title=f"{y}년 품목별 재활용량")
+                fig = px.bar(view_df, x="연도", y="재활용량", title=f"{item} 재활용량 추이")
             elif chart_type == "선그래프":
-                fig = px.line(view_df, x="구분", y="재활용량", markers=True, title=f"{y}년 재활용 추이")
+                fig = px.line(view_df, x="연도", y="재활용량", markers=True, title=f"{item} 재활용량 변화")
             else:
-                fig = px.pie(view_df, names="구분", values="재활용량", title=f"{y}년 품목별 재활용 비율")
+                fig = px.pie(view_df, names="연도", values="재활용량", title=f"{item} 연도별 재활용 비율")
+
             fig.update_layout(yaxis_tickformat=",")
             st.plotly_chart(fig, use_container_width=True)
+
 
 
 
