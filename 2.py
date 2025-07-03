@@ -22,12 +22,18 @@ def load_pesticide_data():
 @st.cache_data
 def load_vinyl_collection_data():
     df = pd.read_csv("연도별_영농폐비닐_수거량.csv", encoding="utf-8-sig")
+
+    # ✅ 열 이름 공백 제거 및 BOM 제거
+    df.columns = df.columns.str.strip().str.replace('\ufeff', '')
+
+    # ✅ melt 적용
     df_long = df.melt(id_vars='구분', var_name='연도', value_name='수거량')
 
     # ✅ 쉼표 제거 후 숫자로 변환
     df_long['수거량'] = df_long['수거량'].astype(str).str.replace(",", "").astype(float)
 
     return df_long
+
 
 @st.cache_data
 def load_container_data():
