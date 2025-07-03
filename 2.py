@@ -98,7 +98,6 @@ elif tab_option == "폐농약":
             filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
             df_plot = filtered.set_index("구분")
             st.dataframe(df_plot.style.format("{:,.0f}"))
-            st.dataframe(styled_df)
             fig = px.bar(df_plot, x=df_plot.index, y=df_plot.columns, barmode="stack", title=f"{year}년 폐농약 발생량")
             fig.update_layout(yaxis_tickformat=",")
             st.plotly_chart(fig, use_container_width=True)
