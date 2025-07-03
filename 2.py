@@ -88,9 +88,9 @@ elif tab_option == "폐농약":
 # 폐농약용기 수거량
 elif tab_option == "폐농약용기 수거량(전국)":
     df = load_container_data()
-    df_long = df.melt(id_vars='구분', var_name='연도', value_name='수거량')
+    df_long = df.melt(id_vars='구분', var_name='연도', value_name='수거량(갯수)')
     df_long['연도'] = df_long['연도'].astype(int)
-    df_long['수거량'] = pd.to_numeric(df_long['수거량'], errors='coerce')
+    df_long['수거량(갯수)'] = pd.to_numeric(df_long['수거량(갯수)'], errors='coerce')
     selected = st.sidebar.multiselect("📦 품목 선택", df_long["구분"].unique(), default=df_long["구분"].unique())
     chart_type = st.sidebar.radio("📊 시각화 선택", ["막대그래프", "선그래프", "파이차트"])
     st.header("📦 폐농약용기 수거량 분석(갯수)")
@@ -99,7 +99,7 @@ elif tab_option == "폐농약용기 수거량(전국)":
         with tabs[i]:
             view_df = df_long[(df_long['연도'] == y) & (df_long['구분'].isin(selected))]
             styled_df = view_df.copy()
-            styled_df["수거량"] = styled_df["수거량"].apply(lambda x: f"{x:,.0f}")
+            styled_df["수거량(갯수)"] = styled_df["수거량(갯수)"].apply(lambda x: f"{x:,.0f}")
             st.dataframe(styled_df[["구분", "수거량"]])
             if chart_type == "막대그래프":
                 fig = px.bar(view_df, x="구분", y="수거량(갯수)", title=f"{y}년 품목별 수거량")
