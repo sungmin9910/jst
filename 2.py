@@ -93,7 +93,7 @@ if tab_option == "폐비닐":
             fig = px.bar(
                 df_plot,
                 x=df_plot.index,
-                y=df_plot.columns,
+                
                 yaxis_title="발생량 (톤)",
                 barmode="stack",
                 title=f"{year}년 폐비닐 발생량"
