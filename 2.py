@@ -11,7 +11,7 @@ import os
 # --------------------------
 @st.cache_data
 def load_vinyl_data():
-    df = pd.read_csv("Update 전북_영농폐비닐_발생량_2020_2023.csv", encoding="cp949")
+    df = pd.read_csv("전북_영농폐비닐_발생량_2020_2023.csv", encoding="cp949")
     return df.loc[:, ~df.columns.str.startswith("증감_")]
 
 
