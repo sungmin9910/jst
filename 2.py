@@ -93,14 +93,15 @@ if tab_option == "폐비닐":
             fig = px.bar(
                 df_plot,
                 x=df_plot.index,
-                
-                yaxis_title="발생량 (톤)",
+                y=df_plot.columns,
                 barmode="stack",
                 title=f"{year}년 폐비닐 발생량"
             )
-            fig.update_layout(yaxis_tickformat=",")
+            fig.update_layout(
+                yaxis_title="발생량(톤)",
+                yaxis_tickformat=","
+            )
             st.plotly_chart(fig, use_container_width=True)
-
 
 # --------------------------
 # 폐농약
