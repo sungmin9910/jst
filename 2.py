@@ -152,7 +152,7 @@ elif tab_option == "폐비닐 수거량(전국)":
             fig.update_layout(
                 yaxis_tickformat=",",
                 xaxis=dict(type='category')  # 🎯 핵심: x축을 범주형으로 강제!
-            fig.update_layout(yaxis_title="수거량 (톤)")    
+              
             )
             st.plotly_chart(fig, use_container_width=True)
 
@@ -191,7 +191,7 @@ elif tab_option == "폐비닐 재활용량(전국)":
             fig.update_layout(
                 yaxis_tickformat=",",
                 xaxis=dict(type='category')
-            fig.update_layout(yaxis_title="재활용용량 (톤)")    
+               
             )
             st.plotly_chart(fig, use_container_width=True)
 
@@ -228,7 +228,7 @@ elif tab_option == "폐농약용기 수거량(전국)":
             fig.update_layout(
                 yaxis_tickformat=",",
                 xaxis=dict(type='category')
-            fig.update_layout(yaxis_title="수거량 (개개)")
+            
             )
             st.plotly_chart(fig, use_container_width=True)
 
@@ -266,7 +266,7 @@ elif tab_option == "폐농약용기 재활용량(전국)":
             fig.update_layout(
                 yaxis_tickformat=",",
                 xaxis=dict(type='category')
-            fig.update_layout(yaxis_title="재활용량 (개)")
+            
             )
             st.plotly_chart(fig, use_container_width=True)
 
