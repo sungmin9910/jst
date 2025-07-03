@@ -151,6 +151,7 @@ elif tab_option == "폐비닐 수거량(전국)":
 
             fig.update_layout(
                 yaxis_tickformat=",",
+                yaxis_title="수거량 (톤)",
                 xaxis=dict(type='category')  # 🎯 핵심: x축을 범주형으로 강제!
               
             )
@@ -190,6 +191,7 @@ elif tab_option == "폐비닐 재활용량(전국)":
 
             fig.update_layout(
                 yaxis_tickformat=",",
+                yaxis_title="재활용량 (톤)",
                 xaxis=dict(type='category')
                
             )
