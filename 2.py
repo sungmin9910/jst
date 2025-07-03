@@ -21,19 +21,7 @@ def load_pesticide_data():
 
 @st.cache_data
 def load_vinyl_collection_data():
-    df = pd.read_csv("연도별_영농폐비닐_수거량.csv", encoding="utf-8-sig")
-
-    # ✅ 열 이름 공백 제거 및 BOM 제거
-    df.columns = df.columns.str.strip().str.replace('\ufeff', '')
-
-    # ✅ melt 적용
-    df_long = df.melt(id_vars='구분', var_name='연도', value_name='수거량')
-
-    # ✅ 쉼표 제거 후 숫자로 변환
-    df_long['수거량'] = df_long['수거량'].astype(str).str.replace(",", "").astype(float)
-
-    return df_long
-
+    return pd.read_csv("연도별_영농폐비닐_수거량.csv", encoding="cp949")
 
 @st.cache_data
 def load_container_data():
@@ -53,11 +41,11 @@ st.title("♻️ 영농폐기물 통합 대시보드 (전북 중심)")
 tab_option = st.sidebar.radio("📁 분석 대상", [
     "폐비닐",
     "폐농약",
-    "폐비닐 수거량(전국)",
     "폐농약용기 수거량(전국)",
     "폐농약용기 재활용량(전국)",
     "폐농약용기 분포지도(전북)",
-    "폐비닐 분포지도(전북)"      
+    "폐비닐 분포지도(전북)",
+    "폐비닐 수거량(전국)"  
 ])
 
 # --------------------------
