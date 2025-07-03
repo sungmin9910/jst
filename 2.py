@@ -118,7 +118,7 @@ elif tab_option == "폐비닐 수거량(전국)":
     df_long = df.melt(id_vars='구분', var_name='연도', value_name='수거량')
     df_long['수거량'] = (
         df_long['수거량']
-        .astype(str)
+        .astype(Int)
         .str.replace(",", "", regex=False)
     )
     df_long['수거량'] = pd.to_numeric(df_long['수거량'], errors='coerce')
