@@ -72,30 +72,15 @@ if tab_option == "폐비닐":
 
     for i, year in enumerate(years):
         with tabs[i]:
+            # ✅ '계' 포함
             cols = [col for col in df.columns if col.startswith(year)]
             filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
             renamed = {col: col.replace(f"{year}_", "") for col in cols}
             df_plot = filtered.rename(columns=renamed).set_index("구분")
-
-            # ✅ 숫자 컬럼 쉼표 포맷 표시용 컬럼 생성
-            df_show = df_plot.copy()
-            for col in df_show.select_dtypes(include='number').columns:
-                df_show[f"{col}_표시용"] = df_show[col].apply(lambda x: f"{x:,.0f}")
-
-            # ✅ 표시용 컬럼만 보여주기
-            columns_to_display = [col for col in df_show.columns if "표시용" in col]
-            df_show = df_show[columns_to_display]
-            df_show.index.name = "구분"
-            st.dataframe(df_show)
-
-            # ✅ 그래프는 기존 숫자형 데이터로 출력
             numeric_cols = df_plot.select_dtypes(include='number').columns
+            st.dataframe(df_plot.style.format({col: "{:,.0f}" for col in numeric_cols}))
             fig = px.bar(df_plot[numeric_cols], x=df_plot.index, y=numeric_cols, barmode="stack", title=f"{year}년 폐비닐 발생량")
-            fig.update_layout(
-                yaxis_tickformat=",",
-                yaxis_title="발생량 (톤)",
-                xaxis=dict(type='category')
-            )
+            fig.update_layout(yaxis_tickformat=",")
             st.plotly_chart(fig, use_container_width=True)
 
 
