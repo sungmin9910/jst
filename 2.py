@@ -22,6 +22,8 @@ def load_pesticide_data():
 @st.cache_data
 def load_vinyl_collection_data():
     return pd.read_csv("연도별_영농폐비닐_수거량.csv", encoding="utf-8-sig")
+    df_long['수거량'] = pd.to_numeric(df_long['수거량'].astype(str).str.replace(",", ""), errors='coerce')
+    return df_long
 
 @st.cache_data
 def load_container_data():
