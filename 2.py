@@ -21,7 +21,7 @@ def load_pesticide_data():
 
 @st.cache_data
 def load_vinyl_collection_data():
-    return pd.read_csv("연도별_영농폐비닐_수거량.csv", encoding="cp949")
+    return pd.read_csv("연도별_영농폐비닐_수거량.csv", encoding="utf-8-sig")
 
 @st.cache_data
 def load_container_data():
