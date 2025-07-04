@@ -145,20 +145,21 @@ elif tab_option == "폐농약":
 
                 st.dataframe(filtered.set_index("구분").applymap(safe_format))
 
-                # 정렬 적용
-                df_plot = df_plot.sort_values(by=f"{year}_계", ascending=False)
-                
-                # 숫자 쉼표 표시
+                # ✅ 그래프용 데이터 변환
+                df_plot = filtered.melt(id_vars="구분", var_name="항목", value_name="발생량(기기)")
+
+                # ✅ 그래프
                 fig = px.bar(
-                    df_melted,
+                    df_plot,
                     x="구분",
-                    y="value",
-                    color="variable",
-                    title=f"{year}년 폐농약 발생량",
-                    text=df_melted["value"].map(lambda x: f"{x:,.0f}")
+                    y="발생량(기기)",
+                    color="항목",
+                    barmode="stack",
+                    text_auto=True,
                 )
                 fig.update_layout(title=f"{year}년 폐농약 발생량", yaxis_title="발생량 (기기)")
                 st.plotly_chart(fig, use_container_width=True)
+
 
 
 
