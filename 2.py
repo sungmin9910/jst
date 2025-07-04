@@ -116,26 +116,36 @@ elif tab_option == "폐농약":
 
     for i, year in enumerate(years):
         with tabs[i]:
-            # ✅ 해당 연도 컬럼만 추출
-            cols = [col for col in df.columns if col.startswith(year)]
+            # ✅ 해당 연도 컬럼 추출
+            cols = [col for col in df.columns if col.startswith(f"{year}_")]
             filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
+
+            # ✅ 필터링 확인
+            if filtered.empty:
+                st.warning(f"⚠️ {year}년에는 선택한 지역에 해당하는 데이터가 없습니다.")
+                continue
 
             # ✅ long-form 변환
             df_long = filtered.melt(id_vars="구분", var_name="항목", value_name="발생량")
             df_long["발생량"] = pd.to_numeric(df_long["발생량"], errors="coerce")
+            df_long = df_long.dropna(subset=["발생량"])
 
-            # ✅ 포맷 함수 정의
+            if df_long.empty:
+                st.warning(f"⚠️ {year}년의 폐농약 데이터가 존재하지 않습니다.")
+                continue
+
+            # ✅ 포맷 함수
             def safe_format(x):
                 try:
                     return f"{x:,.0f}"
                 except:
                     return x
 
-            # ✅ 보기용 표 (wide pivot)
+            # ✅ 보기용 표 출력
             df_pivot = df_long.pivot_table(index="구분", columns="항목", values="발생량")
             st.dataframe(df_pivot.applymap(safe_format))
 
-            # ✅ stacked bar chart 시각화
+            # ✅ 그래프 출력
             fig = px.bar(
                 df_long,
                 x="구분",
@@ -146,10 +156,11 @@ elif tab_option == "폐농약":
             )
             fig.update_layout(
                 yaxis_tickformat=",",
-                yaxis_title="발생량 (개)",
+                yaxis_title="발생량 (기기)",
                 xaxis_title="지역"
             )
             st.plotly_chart(fig, use_container_width=True)
+
 
 
 
