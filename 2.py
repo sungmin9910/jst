@@ -116,23 +116,41 @@ elif tab_option == "폐농약":
 
     for i, year in enumerate(years):
         with tabs[i]:
+            # ✅ 해당 연도 컬럼만 추출
             cols = [col for col in df.columns if col.startswith(year)]
             filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
-            df_plot = filtered.set_index("구분")
 
-            # ✅ 에러 방지용 포맷 함수
+            # ✅ long-form 변환
+            df_long = filtered.melt(id_vars="구분", var_name="항목", value_name="발생량")
+            df_long["발생량"] = pd.to_numeric(df_long["발생량"], errors="coerce")
+
+            # ✅ 포맷 함수 정의
             def safe_format(x):
                 try:
                     return f"{x:,.0f}"
                 except:
                     return x
 
-            st.dataframe(df_plot.applymap(safe_format))
+            # ✅ 보기용 표 (wide pivot)
+            df_pivot = df_long.pivot_table(index="구분", columns="항목", values="발생량")
+            st.dataframe(df_pivot.applymap(safe_format))
 
-            fig = px.bar(df_plot, x=df_plot.index, y=df_plot.columns, barmode="stack", title=f"{year}년 폐농약 발생량")
-            fig.update_layout(yaxis_tickformat=",")
-            fig.update_layout(yaxis_title="발생량 (개)")
+            # ✅ stacked bar chart 시각화
+            fig = px.bar(
+                df_long,
+                x="구분",
+                y="발생량",
+                color="항목",
+                barmode="stack",
+                title=f"{year}년 폐농약 발생량"
+            )
+            fig.update_layout(
+                yaxis_tickformat=",",
+                yaxis_title="발생량 (개)",
+                xaxis_title="지역"
+            )
             st.plotly_chart(fig, use_container_width=True)
+
 
 
 
