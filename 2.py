@@ -72,6 +72,8 @@ tab_option = st.sidebar.radio("📁 분석 대상", [
 
 # --------------------------
 # 폐비닐
+# --------------------------
+# 폐비닐
 if tab_option == "폐비닐":
     df = load_vinyl_data()
     df = df[df["구분"] != "전체"]
@@ -83,13 +85,12 @@ if tab_option == "폐비닐":
 
     for i, year in enumerate(years):
         with tabs[i]:
-            # 해당 연도 데이터 추출
             cols = [col for col in df.columns if col.startswith(year)]
             filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
             renamed = {col: col.replace(f"{year}_", "") for col in cols}
             df_plot = filtered.rename(columns=renamed).set_index("구분")
 
-            # ✅ 쉼표 제거 + 숫자형으로 변환
+            # 숫자형 변환
             for col in df_plot.columns:
                 df_plot[col] = (
                     df_plot[col]
@@ -97,12 +98,14 @@ if tab_option == "폐비닐":
                     .str.replace(",", "")
                     .str.strip()
                 )
-                df_plot[col] = pd.to_numeric(df_plot[col], errors="coerce")  # 숫자만 남음
+                df_plot[col] = pd.to_numeric(df_plot[col], errors="coerce")
 
-            # ✅ 숫자형 유지 + 쉼표 포맷 적용
+            # 표 출력 (쉼표 포맷)
             st.dataframe(df_plot.style.format("{:,.0f}"))
 
-            # ✅ 시각화
+            # '계' 제외 후 그래프
+            df_plot = df_plot.drop(columns=["계"], errors="ignore")
+
             fig = px.bar(
                 df_plot,
                 x=df_plot.index,
@@ -118,8 +121,6 @@ if tab_option == "폐비닐":
 
 # --------------------------
 # 폐농약
-# --------------------------
-# 폐농약
 elif tab_option == "폐농약":
     df = load_pesticide_data()
     df = df[df["구분"] != "전체"]
@@ -131,13 +132,12 @@ elif tab_option == "폐농약":
 
     for i, year in enumerate(years):
         with tabs[i]:
-            # 해당 연도 컬럼 추출
             cols = [col for col in df.columns if col.startswith(year)]
             filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
             renamed = {col: col.replace(f"{year}_", "") for col in cols}
             df_plot = filtered.rename(columns=renamed).set_index("구분")
 
-            # 쉼표 제거 + 숫자형으로 변환
+            # 숫자형 변환
             for col in df_plot.columns:
                 df_plot[col] = (
                     df_plot[col]
@@ -147,10 +147,12 @@ elif tab_option == "폐농약":
                 )
                 df_plot[col] = pd.to_numeric(df_plot[col], errors="coerce")
 
-            # 표 출력: 숫자 쉼표 포맷 적용
+            # 표 출력 (쉼표 포맷)
             st.dataframe(df_plot.style.format("{:,.0f}"))
 
-            # 그래프 시각화
+            # '계' 제외 후 그래프
+            df_plot = df_plot.drop(columns=["계"], errors="ignore")
+
             fig = px.bar(
                 df_plot,
                 x=df_plot.index,
@@ -163,6 +165,7 @@ elif tab_option == "폐농약":
                 yaxis_tickformat=","
             )
             st.plotly_chart(fig, use_container_width=True)
+
 
 
 
