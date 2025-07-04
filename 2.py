@@ -121,36 +121,17 @@ elif tab_option == "폐농약":
         renamed = {col: col.replace(f"{year}_", "") for col in cols}
         df_plot = filtered.rename(columns=renamed).set_index("구분")
 
-        for col in df_plot.columns:
-            df_plot[col] = (
-                df_plot[col]
-                .astype(str)
-                .str.replace(",", "")
-                .str.strip()
-            )
-            df_plot[col] = pd.to_numeric(df_plot[col], errors="coerce")
-
-        # ✅ 여기 교체!
-        def safe_format(x):
-            try:
-                return f"{x:,.0f}"
-            except:
-                return x
-
-        st.dataframe(df_plot.applymap(safe_format))
-
-        fig = px.bar(
-            df_plot,
-            x=df_plot.index,
-            y=df_plot.columns,
-            barmode="stack",
-            title=f"{year}년 폐비닐 발생량"
-        )
-        fig.update_layout(
-            yaxis_title="발생량(톤)",
-            yaxis_tickformat=","
-        )
-        st.plotly_chart(fig, use_container_width=True)
+    for i, year in enumerate(years):
+        with tabs[i]:
+            # ✅ '계' 포함
+            cols = [col for col in df.columns if col.startswith(year)]
+            filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
+            df_plot = filtered.set_index("구분")
+            st.dataframe(df_plot.style.format("{:,.0f}"))
+            fig = px.bar(df_plot, x=df_plot.index, y=df_plot.columns, barmode="stack", title=f"{year}년 폐농약 발생량")
+            fig.update_layout(yaxis_tickformat=",")
+            fig.update_layout(yaxis_title="발생량 (개)")
+            st.plotly_chart(fig, use_container_width=True)
 
 
 
