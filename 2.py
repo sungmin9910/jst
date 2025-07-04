@@ -121,52 +121,22 @@ if tab_option == "폐비닐":
 elif tab_option == "폐농약":
     df = load_pesticide_data()
     df = df[df["구분"] != "전체"]
-    years = sorted({col[:4] for col in df.columns if col[:4].isdigit() and "_" in col})
+    years = sorted({col[:4] for col in df.columns if "_" in col})
 
     st.header("💧 전북 영농 폐농약 발생량")
     selected_regions = st.sidebar.multiselect("📍 지역 선택", df["구분"].unique(), default=df["구분"].unique())
     tabs = st.tabs([f"{y}년" for y in years])
 
     for i, year in enumerate(years):
-        with tabs[i]:
-            # ✅ 정확한 연도별 컬럼 + 증감_ 제외
-            cols = [col for col in df.columns if col.startswith(f"{year}_") and not col.startswith("증감_")]
-
-            # ✅ 지역 필터링
-            filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
-
-            if filtered.empty:
-                st.warning(f"⚠️ {year}년에는 선택한 지역에 해당하는 데이터가 없습니다.")
-                continue
-
-            # ✅ long-form 변환
-            df_long = filtered.melt(id_vars="구분", var_name="항목", value_name="발생량")
-            df_long["발생량"] = pd.to_numeric(df_long["발생량"], errors="coerce")
-            df_long = df_long.dropna(subset=["발생량"])
-
-            if df_long.empty:
-                st.warning(f"⚠️ {year}년의 폐농약 데이터가 존재하지 않습니다.")
-                continue
-
-            # ✅ 표 보기용 피벗
-            df_pivot = df_long.pivot_table(index="구분", columns="항목", values="발생량")
-            st.dataframe(df_pivot.applymap(safe_format))
-
-            # ✅ 시각화
-            fig = px.bar(
-                df_long,
-                x="구분",
-                y="발생량",
-                color="항목",
-                barmode="stack",
-                title=f"{year}년 폐농약 발생량"
-            )
-            fig.update_layout(
-                yaxis_tickformat=",",
-                yaxis_title="발생량 (기기)",
-                xaxis_title="지역"
-            )
-            st.plotly_chart(fig, use_container_width=True)
+    with tabs[i]:
+        # ✅ '계' 포함
+        cols = [col for col in df.columns if col.startswith(year)]
+        filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
+        df_plot = filtered.set_index("구분")
+        st.dataframe(df_plot.style.format("{:,.0f}"))
+        fig = px.bar(df_plot, x=df_plot.index, y=df_plot.columns, barmode="stack", title=f"{year}년 폐농약 발생량")
+        fig.update_layout(yaxis_tickformat=",")
+        st.plotly_chart(fig, use_container_width=True)
 
 
 
