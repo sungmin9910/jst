@@ -118,11 +118,12 @@ if tab_option == "폐비닐":
 
 # --------------------------
 # 폐농약
+# --------------------------
+# 폐농약
 elif tab_option == "폐농약":
     df = load_pesticide_data()
     df = df[df["구분"] != "전체"]
-
-    years = sorted({col[:4] for col in df.columns if "_" in col and col[:4].isdigit()})
+    years = sorted({col[:4] for col in df.columns if "_" in col})
 
     st.header("💧 전북 영농 폐농약 발생량")
     selected_regions = st.sidebar.multiselect("📍 지역 선택", df["구분"].unique(), default=df["구분"].unique())
@@ -130,35 +131,39 @@ elif tab_option == "폐농약":
 
     for i, year in enumerate(years):
         with tabs[i]:
-            cols = [col for col in df.columns if col.startswith(f"{year}_")]
+            # 해당 연도 컬럼 추출
+            cols = [col for col in df.columns if col.startswith(year)]
             filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
+            renamed = {col: col.replace(f"{year}_", "") for col in cols}
+            df_plot = filtered.rename(columns=renamed).set_index("구분")
 
-            if filtered[cols].dropna(how="all").empty:
-                st.warning(f"⚠️ {year}년의 폐농약 데이터가 존재하지 않습니다.")
-            else:
-                # ✅ 숫자 쉼표 포맷
-                def safe_format(x):
-                    try:
-                        return f"{x:,.0f}"
-                    except:
-                        return x
-
-                st.dataframe(filtered.set_index("구분").applymap(safe_format))
-
-                # ✅ 그래프용 데이터 변환
-                df_plot = filtered.melt(id_vars="구분", var_name="항목", value_name="발생량(기기)")
-
-                # ✅ 그래프
-                fig = px.bar(
-                    df_plot,
-                    x="구분",
-                    y="발생량(기기)",
-                    color="항목",
-                    barmode="stack",
-                    text_auto=True,
+            # 쉼표 제거 + 숫자형으로 변환
+            for col in df_plot.columns:
+                df_plot[col] = (
+                    df_plot[col]
+                    .astype(str)
+                    .str.replace(",", "")
+                    .str.strip()
                 )
-                fig.update_layout(title=f"{year}년 폐농약 발생량", yaxis_title="발생량 (기기)")
-                st.plotly_chart(fig, use_container_width=True)
+                df_plot[col] = pd.to_numeric(df_plot[col], errors="coerce")
+
+            # 표 출력: 숫자 쉼표 포맷 적용
+            st.dataframe(df_plot.style.format("{:,.0f}"))
+
+            # 그래프 시각화
+            fig = px.bar(
+                df_plot,
+                x=df_plot.index,
+                y=df_plot.columns,
+                barmode="stack",
+                title=f"{year}년 폐농약 발생량"
+            )
+            fig.update_layout(
+                yaxis_title="발생량(개)",
+                yaxis_tickformat=","
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
 
 
 
