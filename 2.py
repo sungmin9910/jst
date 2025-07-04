@@ -116,15 +116,24 @@ elif tab_option == "폐농약":
 
     for i, year in enumerate(years):
         with tabs[i]:
-            # ✅ '계' 포함
             cols = [col for col in df.columns if col.startswith(year)]
             filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
             df_plot = filtered.set_index("구분")
-            st.dataframe(df_plot.style.format("{:,.0f}"))
+
+            # ✅ 에러 방지용 포맷 함수
+            def safe_format(x):
+                try:
+                    return f"{x:,.0f}"
+                except:
+                    return x
+
+            st.dataframe(df_plot.applymap(safe_format))
+
             fig = px.bar(df_plot, x=df_plot.index, y=df_plot.columns, barmode="stack", title=f"{year}년 폐농약 발생량")
             fig.update_layout(yaxis_tickformat=",")
             fig.update_layout(yaxis_title="발생량 (개)")
             st.plotly_chart(fig, use_container_width=True)
+
 
 
 
