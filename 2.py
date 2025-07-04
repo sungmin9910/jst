@@ -121,11 +121,9 @@ if tab_option == "폐비닐":
 elif tab_option == "폐농약":
     df = load_pesticide_data()
     df = df[df["구분"] != "전체"]
-
-    # 쉼표 제거 및 숫자화
-    for col in df.columns:
-        if col != "구분":
-            df[col] = pd.to_numeric(df[col].astype(str).str.replace(",", ""), errors="coerce")
+    
+    # 연도 추출 (예: '2020_계', '2021_플라스틱' → 2020, 2021 등)
+    years = sorted({col[:4] for col in df.columns if "_" in col and col[:4].isdigit()})
 
     st.header("💧 전북 영농 폐농약 발생량")
     selected_regions = st.sidebar.multiselect("📍 지역 선택", df["구분"].unique(), default=df["구분"].unique())
@@ -133,42 +131,25 @@ elif tab_option == "폐농약":
 
     for i, year in enumerate(years):
         with tabs[i]:
-            cols = [col for col in df.columns if col.startswith(f"{year}_") and not col.startswith("증감_")]
+            # 해당 연도에 해당하는 컬럼들만 필터링 (예: 2020_계, 2020_플라스틱, 2020_농약봉지류)
+            cols = [col for col in df.columns if col.startswith(f"{year}_")]
             filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
 
-            if filtered.empty:
+            # 데이터가 없을 경우 처리
+            if filtered[cols].dropna(how="all").empty:
                 st.warning(f"⚠️ {year}년의 폐농약 데이터가 존재하지 않습니다.")
-                continue
-
-            df_long = filtered.melt(id_vars="구분", var_name="항목", value_name="발생량")
-
-            # 시각화
-            fig = px.bar(
-                df_long,
-                x="구분",
-                y="발생량",
-                color="항목",
-                title=f"{year}년 폐농약 발생량",
-                barmode="stack",
-                text_auto=".2s"
-            )
-            fig.update_layout(yaxis_title="발생량 (기기)", xaxis_title="지역")
-            st.plotly_chart(fig, use_container_width=True)
-
-            # 보기 좋게 숫자 쉼표 추가
-            def safe_format(x):
-                try:
-                    return f"{x:,.0f}"
-                except:
-                    return x
-
-            st.dataframe(filtered.style.format(safe_format))
-
-
-
-
-
-
+            else:
+                df_plot = filtered.melt(id_vars="구분", var_name="항목", value_name="발생량(기기)")
+                fig = px.bar(
+                    df_plot,
+                    x="구분",
+                    y="발생량(기기)",
+                    color="항목",
+                    barmode="stack",
+                    text_auto=True,
+                )
+                fig.update_layout(title=f"{year}년 폐농약 발생량", yaxis_title="발생량 (기기)")
+                st.plotly_chart(fig, use_container_width=True)
 
 
 # --------------------------
