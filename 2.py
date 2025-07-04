@@ -115,13 +115,6 @@ elif tab_option == "폐농약":
     tabs = st.tabs([f"{y}년" for y in years])
 
     for i, year in enumerate(years):
-    with tabs[i]:
-        cols = [col for col in df.columns if col.startswith(year)]
-        filtered = df[df["구분"].isin(selected_regions)][["구분"] + cols]
-        renamed = {col: col.replace(f"{year}_", "") for col in cols}
-        df_plot = filtered.rename(columns=renamed).set_index("구분")
-
-    for i, year in enumerate(years):
         with tabs[i]:
             # ✅ '계' 포함
             cols = [col for col in df.columns if col.startswith(year)]
